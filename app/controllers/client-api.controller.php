@@ -20,9 +20,30 @@ class ClientApiController {
         return json_decode($this->data);
     }
 
+
+
+  
     public function getClients($params = null) {
-        $clients = $this->model->getAll();
-        $this->view->response($clients);
+        $columns= ['id', 'nombre', 'apellido', 'dni', 'email'];
+        
+        if ( isset($_GET['sort']) && (isset($_GET['order'])) ){
+            $sort= $_GET['sort'];
+            $order= $_GET['order'];
+            
+            if((in_array($sort, $columns)) && ($order == 'asc' || $order == 'desc')){
+                $clients= $this->model->getClientOrder($sort, $order);
+                $this->view->response($clients);
+            } 
+            else {
+                $this->view->response("No existe esa columna");
+            }           
+        }
+        else{
+            $clients = $this->model->getAll();
+            $this->view->response($clients);
+        }
+            
+       
         }
 
     public function getClient($params = null) {
@@ -43,7 +64,7 @@ class ClientApiController {
         $client = $this->model->get($id);
         if ($client) {
             $this->model->delete($id);
-            $this->view->response($client);
+            $this->view->response("El cliente fue eliminado con éxito", 200);
         } else 
             $this->view->response("El cliente con el id=$id no existe", 404);
     }
@@ -63,12 +84,10 @@ class ClientApiController {
     public function updateClient($params = null){
         $id = $params[':ID'];
 
-        $client = $this->model->get($id);
-
         $data= $this->getData();
 
-        if ($client) {
-            $this->model->update($client, $data->nombre, $data->apellido,  $data->dni,  $data->email );
+        if ($id) {
+            $this->model->update($id, $data->nombre, $data->apellido,  $data->dni,  $data->email );
             $this->view->response("El cliente fue modificado con éxito", 200);
         } else 
             $this->view->response("El cliente con el id=$id no existe", 404);
