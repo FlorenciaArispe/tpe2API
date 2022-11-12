@@ -23,7 +23,7 @@ class ClientApiController {
     public function getClients($params = null) {
         //FILTRO
         if ( isset($_GET['filtername']) ){        
-            $filterName= mb_strtolower($_GET['filtername']);                 
+            $filterName= mb_strtolower($_GET['filtername']);               
         }
         else{
             $filterName= null;

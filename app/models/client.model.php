@@ -57,13 +57,15 @@ class ClientModel {
             var_dump($e);
         }
     }    
-/*
+    /*
     public function getNames(){
         $query = $this->db->prepare('SELECT nombre FROM cliente');
+
         $query->execute();
         $names= $query->fetchAll(PDO::FETCH_OBJ);
+
         return $names;        
     }   
-    */ 
+    */
 }
 ?>
