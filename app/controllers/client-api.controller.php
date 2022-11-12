@@ -19,59 +19,47 @@ class ClientApiController {
     private function getData() {
         return json_decode($this->data);
     }
-
-
-
   
     public function getClients($params = null) {
+        //FILTRO
+        if ( isset($_GET['filtername']) ){        
+            $filterName= mb_strtolower($_GET['filtername']);                 
+        }
+        else{
+            $filterName= null;
+        }
 
-
-        $columns= ['id', 'nombre', 'apellido', 'dni', 'email'];
-        
-
-
-        if ( isset($_GET['sort']) && (isset($_GET['order'])) ){
-
+        //ORDERNAR       
+        if (isset($_GET['sort']) && (isset($_GET['order']))){
             $sort= $_GET['sort'];
             $order= $_GET['order'];
-
-            if((in_array($sort, $columns)) && ($order == 'asc' || $order == 'desc')){
-                $clients= $this->model->getClientOrder($sort, $order);
-                $this->view->response($clients);
-            }
-            
+        }
+        else {
+            $sort= null;
+            $order=null;
         }
 
-        if ( isset($_GET['page']) && (isset($_GET['limit'])) ) {
-            $page= $_GET['page'];
-            $limit= $_GET['limit'];
-            $offset= (($page-1)* $limit);
-
-            $clients= $this->model->getClientPagin($offset, $limit);
-            $this->view->response($clients);
-
+         //PAGINADO
+         if (isset($_GET['page']) && (isset($_GET['limit']))){            
+            $page= intval($_GET['page']); //INTVAL LO CONVIERTE A ENTERO
+            $limit= intval($_GET['limit']);            
+            $offset= ($limit * $page) - $limit;            
+        }
+        else {
+            $offset= null;
+            $limit=null;
         }
 
-        if ( isset($_GET['filternombre']) ){
-            $filterNombre= mb_strtolower($_GET['filternombre']);
-           
-
-            $clients= $this->model->getClientFilter($filterNombre);
-
- 
-            $this->view->response($clients);
-        }
-
-
-       
+        $result= $this->model->getAll($filterName, $offset, $limit, $order, $sort);
+        $this->view->response($result);
     }
 
     public function getClient($params = null) {
-        // obtengo el id del arreglo de params
+        //obtengo el id del arreglo de params
         $id = $params[':ID'];
         $client = $this->model->get($id);
 
-        // si no existe devuelvo 404
+        //si no existe devuelvo 404
         if ($client)
             $this->view->response($client);
         else 
@@ -80,21 +68,22 @@ class ClientApiController {
 
     public function deleteClient($params = null) {
         $id = $params[':ID'];
-
         $client = $this->model->get($id);
-        if ($client) {
+        if ($client){
             $this->model->delete($id);
             $this->view->response("El cliente fue eliminado con éxito", 200);
-        } else 
+        } 
+        else 
             $this->view->response("El cliente con el id=$id no existe", 404);
     }
 
     public function insertClient($params = null) {
         $client = $this->getData();
 
-        if (empty($client->nombre) || empty($client->apellido) || empty($client->dni) || empty($client->email)) {
+        if (empty($client->nombre) || empty($client->apellido) || empty($client->dni) || empty($client->email)){
             $this->view->response("Complete los datos", 400);
-        } else {
+        } 
+        else{
             $id = $this->model->insert($client->nombre, $client->apellido, $client->dni, $client->email);
             $client = $this->model->get($id);
             $this->view->response($client, 201);
@@ -103,7 +92,6 @@ class ClientApiController {
 
     public function updateClient($params = null){
         $id = $params[':ID'];
-
         $data= $this->getData();
 
         if ($id) {
@@ -111,7 +99,5 @@ class ClientApiController {
             $this->view->response("El cliente fue modificado con éxito", 200);
         } else 
             $this->view->response("El cliente con el id=$id no existe", 404);
-
     }
-
 }

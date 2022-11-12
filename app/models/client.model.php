@@ -8,68 +8,26 @@ class ClientModel {
         $this->db = new PDO ('mysql:host=localhost;'.'dbname=db_showroom;charset=utf8mb4', 'root', '');
     }
 
-    public function getClientOrder($sort, $order){
-        $query= $this->db->prepare("SELECT * FROM cliente ORDER BY $sort $order");
-        $query->execute(); 
-        $clients= $query->fetchAll(PDO::FETCH_OBJ);
-        return $clients;
-    }
+    public function getAll($filterName, $offset, $limit, $order, $sort){
+        $consultation= "SELECT * FROM cliente";
 
-    public function getClientPagin($offset, $limit){
-        $query= $this->db->prepare("SELECT * FROM cliente LIMIT $limit OFFSET $offset");
-            $query->execute(); 
-            $clients= $query->fetchAll (PDO::FETCH_OBJ);
-            return $clients;
-    }
-
-    public function getClientFilter($filterNombre){
-        
-        $query= $this->db->prepare("SELECT * FROM cliente WHERE nombre LIKE '%$filterNombre%'");
-        $query->execute(); 
-       
-        $clients= $query->fetchAll(PDO::FETCH_OBJ);
-       
-        
-        return $clients;
-    }
-
-
-/*
-    public function getClients($sort, $order, $limit, $offset, $filterNombre){
-
-
-        if(($sort!= null)&&($order!= null)){
-            $query= $this->db->prepare("SELECT * FROM cliente ORDER BY $sort $order");
-            $query->execute(); 
-            $clients= $query->fetchAll (PDO::FETCH_OBJ);
+        if(isset($filterName)){ //SI TIENE UN VALOR DISTINTO A NULL
+            $consultation .= " WHERE nombre LIKE '%$filterName%'"; //CONCATENAR LAS CONSULTAS
         }
 
-        if ($limit!= null){
-            $query= $this->db->prepare("SELECT * FROM cliente LIMIT $limit OFFSET $offset");
-            $query->execute(); 
-            $clients= $query->fetchAll (PDO::FETCH_OBJ);
+        if ((isset($sort))&&(isset($order))){
+            $consultation .= " ORDER BY $sort $order";            
         }
 
-        if ($filterNombre!= null){
-            $query= $this->db->prepare("SELECT * FROM cliente WHERE nombre LIKE $filterNombre");
-            $query->execute(); 
-            $clients= $query->fetchAll (PDO::FETCH_OBJ);
-        }   
+        if(isset($limit)){
+            $consultation .= " LIMIT $limit OFFSET $offset";
+        }
 
-        
-
-              
-        
+        $query= $this->db->prepare($consultation);
+        $query->execute();
+        $clients= $query->fetchAll(PDO:: FETCH_OBJ);
         return $clients;
     }
-*/
-    public function getAll(){
-        $query= $this->db->prepare("SELECT * FROM cliente");
-        $query->execute();        
-        $clients= $query->fetchAll (PDO::FETCH_OBJ);
-        return $clients;
-    }
-
 
     public function get($id){
         $query= $this->db->prepare("SELECT * FROM cliente WHERE id= ?");
@@ -99,8 +57,13 @@ class ClientModel {
             var_dump($e);
         }
     }    
-    
-
-    
+/*
+    public function getNames(){
+        $query = $this->db->prepare('SELECT nombre FROM cliente');
+        $query->execute();
+        $names= $query->fetchAll(PDO::FETCH_OBJ);
+        return $names;        
+    }   
+    */ 
 }
 ?>
