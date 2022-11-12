@@ -10,26 +10,66 @@ class ClientModel {
 
     public function getClientOrder($sort, $order){
         $query= $this->db->prepare("SELECT * FROM cliente ORDER BY $sort $order");
-        $query->execute();        
-        $clients= $query->fetchAll (PDO::FETCH_OBJ);
+        $query->execute(); 
+        $clients= $query->fetchAll(PDO::FETCH_OBJ);
         return $clients;
     }
 
+    public function getClientPagin($offset, $limit){
+        $query= $this->db->prepare("SELECT * FROM cliente LIMIT $limit OFFSET $offset");
+            $query->execute(); 
+            $clients= $query->fetchAll (PDO::FETCH_OBJ);
+            return $clients;
+    }
+
+    public function getClientFilter($filterNombre){
+        
+        $query= $this->db->prepare("SELECT * FROM cliente WHERE nombre LIKE '%$filterNombre%'");
+        $query->execute(); 
+       
+        $clients= $query->fetchAll(PDO::FETCH_OBJ);
+       
+        
+        return $clients;
+    }
+
+
+/*
+    public function getClients($sort, $order, $limit, $offset, $filterNombre){
+
+
+        if(($sort!= null)&&($order!= null)){
+            $query= $this->db->prepare("SELECT * FROM cliente ORDER BY $sort $order");
+            $query->execute(); 
+            $clients= $query->fetchAll (PDO::FETCH_OBJ);
+        }
+
+        if ($limit!= null){
+            $query= $this->db->prepare("SELECT * FROM cliente LIMIT $limit OFFSET $offset");
+            $query->execute(); 
+            $clients= $query->fetchAll (PDO::FETCH_OBJ);
+        }
+
+        if ($filterNombre!= null){
+            $query= $this->db->prepare("SELECT * FROM cliente WHERE nombre LIKE $filterNombre");
+            $query->execute(); 
+            $clients= $query->fetchAll (PDO::FETCH_OBJ);
+        }   
+
+        
+
+              
+        
+        return $clients;
+    }
+*/
     public function getAll(){
         $query= $this->db->prepare("SELECT * FROM cliente");
         $query->execute();        
         $clients= $query->fetchAll (PDO::FETCH_OBJ);
         return $clients;
     }
-    /*
 
-    public function getAllOrder(){
-        $query= $this->db->prepare("SELECT * FROM cliente ORDER BY nombre ASC | DESC");
-        $query->execute();
-        $clients= $query->fetchAll (PDO::FETCH_OBJ);
-        return $clients;
-    }
-    */
 
     public function get($id){
         $query= $this->db->prepare("SELECT * FROM cliente WHERE id= ?");

@@ -24,27 +24,47 @@ class ClientApiController {
 
   
     public function getClients($params = null) {
+
+
         $columns= ['id', 'nombre', 'apellido', 'dni', 'email'];
         
+
+
         if ( isset($_GET['sort']) && (isset($_GET['order'])) ){
+
             $sort= $_GET['sort'];
             $order= $_GET['order'];
-            
+
             if((in_array($sort, $columns)) && ($order == 'asc' || $order == 'desc')){
                 $clients= $this->model->getClientOrder($sort, $order);
                 $this->view->response($clients);
-            } 
-            else {
-                $this->view->response("No existe esa columna");
-            }           
+            }
+            
         }
-        else{
-            $clients = $this->model->getAll();
+
+        if ( isset($_GET['page']) && (isset($_GET['limit'])) ) {
+            $page= $_GET['page'];
+            $limit= $_GET['limit'];
+            $offset= (($page-1)* $limit);
+
+            $clients= $this->model->getClientPagin($offset, $limit);
+            $this->view->response($clients);
+
+        }
+
+        if ( isset($_GET['filternombre']) ){
+            $filterNombre= mb_strtolower($_GET['filternombre']);
+           
+
+            $clients= $this->model->getClientFilter($filterNombre);
+
+ 
             $this->view->response($clients);
         }
-            
+
+
        
-        }
+    }
 
     public function getClient($params = null) {
         // obtengo el id del arreglo de params
